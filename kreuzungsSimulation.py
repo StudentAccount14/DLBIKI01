@@ -17,7 +17,8 @@ cars = {}        #speichert die Autos
 arrows = {}      # speichert die Canvasobjekte der angezeigten Pfeile
 arrow_car = {}   # speichert den Autonamen, der den Pfeil für einen Stapel mehrerer Autos liefert
 traffic_lights = {}  # speichert die Canvasobjekte der Ampeln (die Ampeln)
-priority_signs = {} # speichert die Canvasobjekte der Vorfahrtsstrasse (die Schilder)
+priority_signs = {} # speichert die Canvasobjekte der Vorfahrtsstraße (die Schilder)
+
 #Anzahl der Autos
 car_count = 0
 
@@ -29,10 +30,12 @@ def change_rule_set(*args):
         current_mode = selected
         # Prolog-Interpreter wird neu initialisiert, damit alte Moduldefinitionen keine Fehler verursachen
         prolog = Prolog()
-        list(prolog.query(f"retractall({current_mode}:vehicle(_,_,_))."))
+        # Um die "alten" Vehikelfakten zu löschen (falls zurückgewechselt wird)
+        list(prolog.query(f"retractall({current_mode}:vehicle(_,_,_))"))
         for car in list(cars.keys()):
             canvas.delete(cars[car]["canvas_item"])
             del cars[car]
+        # GUI reseten
         # Pfeile zurücksetzen
         for pos in list(arrows.keys()):
             canvas.delete(arrows[pos])
@@ -89,7 +92,7 @@ def update_ampel_config(selection):
     update_traffic_lights(selection)
     status_label.config(text=f"Ampel: {selection}")
 
-# Funktion zur Aktualisierung der Vorfahrtsstrassenkonfiguration
+# Funktion zur Aktualisierung der Vorfahrtsstraßenkonfiguration
 def update_priority_street_config(selection):
     list(prolog.query(f"retractall({current_mode}:priority_street(_, _))"))
     if selection == "NS":
@@ -113,11 +116,11 @@ root.title("Kreuzungssimulation für DLBIKI01")
 tooltip = None
 
 # Globales resizen und laden der PNG-Bildes
-# Kreuzung
+# Lädt das Hintergrundbild der Kreuzung und skaliert es auf 400×400
 bg_pil_image = Image.open("Kreuzung.png").resize((400, 400))
 bg_image = ImageTk.PhotoImage(bg_pil_image)
 
-# Lädt die Ampelbilder
+# Lädt und skaliert die Ampelbilder
 ampel_green_pil = Image.open("gruene_ampel.png").resize((40, 60))
 ampel_red_pil = Image.open("rote_ampel.png").resize((40, 60))
 ampel_green_image = ImageTk.PhotoImage(ampel_green_pil)
@@ -135,24 +138,24 @@ status_label.pack(pady=10)
 canvas = tk.Canvas(root, width=400, height=400, bg="lightgrey")
 canvas.pack(pady=10)
 
-# Für das Hintergrundbild
+# Platziert das Hintergrundbild auf dem Canvas
 canvas_bg = canvas.create_image(200, 200, image=bg_image)
 
-#Alternative falls es Probleme mit dem Hintergrundbild gibt:
+#Alternative, falls es Probleme mit dem Hintergrundbild gibt:
 #canvas.create_line(200, 0, 200, 300, width=80, fill="gray")
 #canvas.create_line(0, 150, 400, 150, width=80, fill="gray")
 
-#Beschriftung
+# Zum Beschriften der Zufahrtsstraßen
 canvas.create_text(200, 80, text="NORTH", fill="white", font=("Arial", 12, "bold"))
 canvas.create_text(200, 320, text="SOUTH", fill="white", font=("Arial", 12, "bold"))
 canvas.create_text(350, 200, text="EAST", fill="white", font=("Arial", 12, "bold"))
 canvas.create_text(60, 200, text="WEST", fill="white", font=("Arial", 12, "bold"))
 
-# Funktionen zum Zeichnen der Ampeln und Schilder
+# Funktionen zum Zeichnen der Ampeln und Vorfahrtsschilder
 
 # Funktion zum Zeichnen der Ampeln
 def update_traffic_lights(selection):
-    # Löscht die altn Ampeln, falls sie noch vorhanden ist
+    # Löscht die alten Ampeln, falls sie noch vorhanden sind
     for dir in list(traffic_lights.keys()):
         canvas.delete(traffic_lights[dir])
     traffic_lights.clear()
@@ -163,9 +166,9 @@ def update_traffic_lights(selection):
         "east": (275, 125),
         "west": (125, 275)
     }
-    #Für normale Ampelsituationen gibt es nur 2 Möglichkeiten: NS oder WE grün
+    #Für normale Ampelsituationen gibt es nur 2 Möglichkeiten: NS oder EW grün
     if selection == "NS gruen":
-        # Norden und Süden: Grün, Westen und Osten: Rot
+        # Norden und Süden: Grün, Osten und Westen: Rot
         traffic_lights["north"] = canvas.create_image(positions["north"][0], positions["north"][1], image=ampel_green_image)
         traffic_lights["south"] = canvas.create_image(positions["south"][0], positions["south"][1], image=ampel_green_image)
         traffic_lights["east"] = canvas.create_image(positions["east"][0], positions["east"][1], image=ampel_red_image)
@@ -179,13 +182,13 @@ def update_traffic_lights(selection):
         traffic_lights["east"] = canvas.create_image(positions["east"][0], positions["east"][1], image=ampel_green_image)
         traffic_lights["west"] = canvas.create_image(positions["west"][0], positions["west"][1], image=ampel_green_image)
 
-
+# Funktion zum Zeichnen der Vorfahrtsschilder
 def update_priority_signs(config):
-    # Löscht die alten Schilder
+    # Löscht die alten Vorfahrtsschilder
     for key in list(priority_signs.keys()):
         canvas.delete(priority_signs[key])
     priority_signs.clear()
-    # Definiert, welche Richtungen bei welcher Einstellung Schilder erhalten
+    # Definiert, welche Zufahrtsstraßen bei welcher Einstellung Schilder erhalten
     config_map = {
         "NS": ["north", "south"],
         "NE": ["north", "east"],
@@ -206,7 +209,7 @@ def update_priority_signs(config):
         priority_signs[direction] = sign
 
 
-# Tooltip-Funktion, damit man den Namen des Autos sieht beim Mouse-Over
+# Tooltip-Funktion, damit der Namen des Autos beim Mouse-Over angezeigt wird
 def show_tooltip(event):
     global tooltip
     x, y = event.x, event.y
@@ -226,12 +229,13 @@ def show_tooltip(event):
             tooltip.label = label
         else:
             tooltip.label.config(text=tooltip_text)
+        # Tooltip mit kleinem Offset neben dem Mauszeiger positionieren
         tooltip.wm_geometry(f"+{event.x_root + 10}+{event.y_root + 10}")
     else:
         if tooltip:
             tooltip.destroy()
             tooltip = None
-
+# Events zum Aktualisieren und zum Ausblenden des Tooltip
 canvas.bind("<Motion>", show_tooltip)
 canvas.bind("<Leave>", lambda event: (tooltip.destroy() if tooltip else None))
 
@@ -255,7 +259,7 @@ position_options = ["north", "south", "west", "east"]
 position_menu = tk.OptionMenu(control_frame, position_var, *position_options)
 position_menu.grid(row=0, column=3, padx=5)
 
-# Dropdown-Menü für die Fahrrichtungswahl (right, left, straight)
+# Dropdown-Menü für die Fahrtrichtungswahl (right, left, straight)
 direction_label = tk.Label(control_frame, text="Richtung:")
 direction_label.grid(row=0, column=4, padx=5)
 direction_var = tk.StringVar(value="straight")
@@ -263,7 +267,7 @@ direction_options = ["right", "left", "straight"]
 direction_menu = tk.OptionMenu(control_frame, direction_var, *direction_options)
 direction_menu.grid(row=0, column=5, padx=5)
 
-# Dropdown-Menü für die Ampelkonfiguration (nur bei ampelgesteuertern Kreuzung)
+# Dropdown-Menü für die Ampelkonfiguration (nur bei ampelgesteuerter Kreuzung)
 ampel_config_label = tk.Label(control_frame, text="Ampelkonfiguration:")
 ampel_config_var = tk.StringVar(value="NS gruen")
 ampel_config_options = ["NS gruen", "EW gruen"]
@@ -312,7 +316,7 @@ def create_direction_arrow(pos, direction, x, y):
             return canvas.create_line(x + 10, y, x + 10, y + 20, arrow=tk.LAST, width=4)
     return None
 
-# Aktualisiert oder entfernt den Pfeil, falls das "Leitauto" entfernt wurde (losgefahren ist).
+# Aktualisiert oder entfernt den Pfeil, falls das führende Auto entfernt wurde (losgefahren ist).
 def update_arrow_for_position(pos):
     candidates = []
     for car_name, data in cars.items():
@@ -407,10 +411,15 @@ def check_car_status(car_name):
 
 #Zum Ermitteln, welches Auto als Nächstes fahren kann
 def next_car():
+    # Prüft, ob ein Auto vorhanden ist
+    if not cars:
+        status_label.config(text="Kein Auto vorhanden. Bitte Auto hinzufügen.")
+        return
+
     query_result = list(prolog.query(f"{current_mode}:can_go(X)"))
     if query_result:
         next_car_name = query_result[0]['X']
-        print(f"{next_car_name} darf als nächstes fahren.")
+        print(f"{next_car_name} darf als Nächstes fahren.")
         status_label.config(text=f"{next_car_name} fährt jetzt.")
         if next_car_name in cars:
             posA = cars[next_car_name]["position"]
