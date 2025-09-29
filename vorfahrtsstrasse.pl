@@ -24,7 +24,7 @@ opposite(west, east).
 % Anmerkung: Diese und die nächste Regel prüfen nicht, ob beide Fahrzeuge auf (oder nicht auf)
 % der Vorfahrtsstraße sind. Diese Überprüfung findet in can_go/1 statt.
 has_priority_over(PosA, _DirA, PosB, _DirB) :-
-    to_right_of(PosA, PosB).
+    to_right_of(PosA, PosB).  % A kommt von rechts von B
 
 % Linksabbieger-Regel: Bei Gegenverkehr hat ein Fahrzeug A (das geradeaus oder rechts fährt)
 % Vorfahrt gegenüber einem Fahrzeug B, das links abbiegt.
@@ -45,20 +45,20 @@ on_priority_street(VName) :-
     (priority_street(PosA, _) ; priority_street(_, PosA)).
 
 % Hilfsprädikat für Fall 3.
-% Prüft, ob ein Fahrzeug (VName) durch ein anderes Fahrzeug (OtherName) blockiert wird, das gemäß den Vorfahrtsregeln Vorrang
+% Prüft, ob ein Fahrzeug A (VName) durch ein anderes Fahrzeug B (OtherName) blockiert wird, das gemäß den Vorfahrtsregeln Vorrang
 % hätte, aber nicht auf der Vorfahrtsstraße fährt.
 conflict(VName, PosA, DirA) :-
-    vehicle(OtherName, PosB, DirB),
-    has_priority_over(PosB, DirB, PosA, DirA),
-    \+ on_priority_street(OtherName),
-    OtherName \= VName.
+    vehicle(OtherName, PosB, DirB),          % Ein Fahrzeug B existiert
+    has_priority_over(PosB, DirB, PosA, DirA), % B hat nach Vorfahrtsregeln Vorrang vor A
+    \+ on_priority_street(OtherName),          % B ist nicht auf Vorfahrtsstraße
+    OtherName \= VName.                     % B ist nicht A
 
-% Hauptregel: can_go(VName) ist wahr, wenn das Fahrzeug VName fahren darf.
+% Hauptregel: can_go(VName) ist wahr, wenn das Fahrzeug A (VName) fahren darf.
 % Fallunterscheidungen
 % Fall 1: Es gibt nur ein Fahrzeug, dann darf es fahren.
 can_go(VName) :-
     vehicle(VName, _, _),
-    \+ ( vehicle(OtherName, _, _), OtherName \= VName ).
+    \+ ( vehicle(OtherName, _, _), OtherName \= VName ).  % Es existiert kein anderes Fahrzeug
 
 
 % Fall 2: Es gibt Fahrzeuge auf der Vorfahrtsstraße.
@@ -70,7 +70,7 @@ can_go(VName) :-
         on_priority_street(OtherName),
         OtherName \= VName,
         has_priority_over(PosB, DirB, PosA, DirA)
-    ).
+    ).  % Diese Negation bedeutet es gibt kein anderes Fahrzeug auf der Vorfahrtsstraße mit Vorrang vor A
 
 
 % Fall 3: Alle Fahrzeuge sind nicht auf einer Vorfahrtsstraße.

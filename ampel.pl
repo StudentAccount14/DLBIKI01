@@ -34,12 +34,12 @@ has_priority_over(PosA, DirA, PosB, DirB) :-
     DirB = left,                  % B will links abbiegen
     (DirA = straight; DirA = right). % A will geradeaus fahren oder rechts abbiegen
 
-% Hilfsprädikat: has_green_light(VName) ist wahr, wenn die Zufahrt des Fahrzeugs VName aktuell Grün zeigt.
+% Hilfsprädikat: has_green_light(VName) ist wahr, wenn die Zufahrt (PosA) des Fahrzeugs A (VName) aktuell Grün zeigt.
 has_green_light(VName) :-
     vehicle(VName, PosA, _),
     light(PosA, green).
 
-% Hauptregel: can_go(VName) ist wahr, wenn das Fahrzeug VName fahren darf.
+% Hauptregel: can_go(VName) ist wahr, wenn das Fahrzeug A (VName) fahren darf.
 % Ein Fahrzeug darf nur fahren, wenn es Grün hat.
 % Bei mehreren Fahrzeugen mit Grünlicht gilt die Konfliktprüfung anhand der Vorfahrtsregeln.
 can_go(VName) :-
@@ -50,4 +50,4 @@ can_go(VName) :-
         has_green_light(OtherName),
         OtherName \= VName,
         has_priority_over(PosB, DirB, PosA, DirA)
-    ).
+    ). % Diese Negation bedeutet es gibt kein anderes Fahrzeug mit Grün mit Vorrang vor A

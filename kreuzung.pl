@@ -27,7 +27,7 @@ priority_order(east, 4).
 
 % Rechts-vor-Links: Fahrzeug A hat Vorfahrt vor B, wenn A von rechts kommt.
 has_priority_over(PosA, _DirA, PosB, _DirB) :-
-    to_right_of(PosA, PosB).
+    to_right_of(PosA, PosB).  % A kommt von rechts von B
 
 % Linksabbieger-Regel: Fahrzeug A (entgegenkommend) hat Vorfahrt vor B,
 % wenn B links abbiegt und A geradeaus fährt oder rechts abbiegt.
@@ -41,30 +41,31 @@ has_priority_over(PosA, DirA, PosB, DirB) :-
 non_conflicting(PosA, Dir, PosB, Dir) :-
     opposite(PosA, PosB).
 
-% Prüft, ob ein Fahrzeug VName durch ein anderes blockiert wird.
+% Prüft, ob ein Fahrzeug A (VName) durch ein anderes Fahrzeug B (Blocker) blockiert wird.
 blocked_by(VName, Blocker) :-
     vehicle(VName, PosA, DirA),
     vehicle(Blocker, PosB, DirB),
-    Blocker \= VName,
-    \+ non_conflicting(PosA, DirA, PosB, DirB),
-    has_priority_over(PosB, DirB, PosA, DirA).
+    Blocker \= VName,             % B ist nicht A (Die Fahrzeuge sind verschieden)
+    \+ non_conflicting(PosA, DirA, PosB, DirB),   % A und B sind nicht konfliktfrei
+    has_priority_over(PosB, DirB, PosA, DirA).    % B hat Vorrang vor A
 
 
-% Tie-Breaker: VName hat die höchste Priorität, wenn kein anderes Fahrzeug mit
-% einer besseren (niedrigeren) Priorität existiert.
+% Tie-Breaker: A (VName) hat die höchste Priorität, wenn kein anderes Fahrzeug B (OtherName)
+% mit einer besseren (niedrigeren) Priorität existiert.
 tie_breaker(VName) :-
     vehicle(VName, Pos, _),
-    priority_order(Pos, P),
+    priority_order(Pos, P),   % P = Priorität von der Position von A
     \+ ( vehicle(OtherName, OtherPos, _),
          OtherName \= VName,
-         priority_order(OtherPos, POther),
+         priority_order(OtherPos, POther),  % POther = Priorität von der Position von B
          POther < P
-       ).
+       ).   % Die Negation bedeutet es gibt kein B mit niedrigerer Priorität als A
 
 % Prüft, ob kein Fahrzeug aktuell unblockiert ist, also alle Fahrzeuge blockiert sind.
 no_unblocked_vehicle :-
     \+ ( vehicle(VName, _, _), \+ blocked_by(VName, _) ).
 
+% Hauptregel: can_go(VName) ist wahr, wenn das Fahrzeug A (VName) fahren darf.
 % Fall 1: Der Normalfall. Ein Fahrzeug darf fahren, wenn es nicht blockiert ist.
 can_go(VName) :-
     vehicle(VName, _, _),
