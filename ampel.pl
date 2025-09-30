@@ -8,24 +8,11 @@
 % Positionen im Uhrzeigersinn: north, east, south, west 
 % Fahrtrichtungen: straight, left, right (geradeaus, links, rechts)
 
-% Fakten: to_right_of(X, Y) bedeutet: Die Straße X liegt rechts von Straße Y aus Sicht des Fahrers auf Y.
-% Anmerkung:  Diese Fakten werden in diesem Modul nicht verwendet.
-to_right_of(north, east).
-to_right_of(east, south).
-to_right_of(south, west).
-to_right_of(west, north).
-
 % Fakten: opposite(X, Y) bedeutet: X und Y liegen einander gegenüber.
 opposite(north, south).
 opposite(south, north).
 opposite(east, west).
 opposite(west, east).
-
-
-% Nicht-Konflikt-Situation: Zwei Fahrzeuge stehen sich gegenüber und haben dieselbe Abbiegerichtung,
-% wodurch sie sich nicht gegenseitig blockieren.
-non_conflicting(PosA, Dir, PosB, Dir) :-
-    opposite(PosA, PosB).
 
 % Linksabbieger-Regel: Bei Gegenverkehr hat ein Fahrzeug A (das geradeaus oder rechts fährt)
 % Vorfahrt gegenüber einem Fahrzeug B, das links abbiegt.

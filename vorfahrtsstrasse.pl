@@ -33,11 +33,6 @@ has_priority_over(PosA, DirA, PosB, DirB) :-
     DirB = left,                  % B will links abbiegen
     (DirA = straight; DirA = right). % A will geradeaus fahren oder rechts abbiegen
 
-% Nicht-Konflikt-Situation: Zwei Fahrzeuge stehen sich gegenüber und haben dieselbe Abbiegerichtung,
-% wodurch sie sich nicht gegenseitig blockieren.
-non_conflicting(PosA, Dir, PosB, Dir) :-
-    opposite(PosA, PosB).
-
 % Hilfsprädikat: Ein Fahrzeug befindet sich auf der Vorfahrtsstraße,
 % wenn seine aktuelle Position Teil eines in priority_street/2 definierten Verlaufs ist.
 on_priority_street(VName) :-
