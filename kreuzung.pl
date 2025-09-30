@@ -36,6 +36,9 @@ has_priority_over(PosA, DirA, PosB, DirB) :-
     DirB = left,                  % B will links abbiegen
     (DirA = straight; DirA = right).  % A fährt geradeaus oder will rechts abbiegen
 
+% Annahme: Gegenüberliegende Linksabbieger biegen voreinander in die nächste Fahrspur ab
+% und behindern sich nicht.
+
 % Nicht-Konflikt-Situation: Zwei Fahrzeuge stehen sich gegenüber und haben dieselbe Abbiegerichtung,
 % wodurch sie sich nicht gegenseitig blockieren.
 non_conflicting(PosA, Dir, PosB, Dir) :-

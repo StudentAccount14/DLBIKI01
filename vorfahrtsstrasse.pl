@@ -26,6 +26,7 @@ opposite(west, east).
 has_priority_over(PosA, _DirA, PosB, _DirB) :-
     to_right_of(PosA, PosB).  % A kommt von rechts von B
 
+
 % Linksabbieger-Regel: Bei Gegenverkehr hat ein Fahrzeug A (das geradeaus oder rechts fährt)
 % Vorfahrt gegenüber einem Fahrzeug B, das links abbiegt.
 has_priority_over(PosA, DirA, PosB, DirB) :-
@@ -38,6 +39,9 @@ has_priority_over(PosA, DirA, PosB, DirB) :-
 on_priority_street(VName) :-
     vehicle(VName, PosA, _),
     (priority_street(PosA, _) ; priority_street(_, PosA)).
+
+% Annahme: Gegenüberliegende Linksabbieger biegen voreinander in die nächste Fahrspur ab
+% und behindern sich nicht.
 
 % Hilfsprädikat für Fall 3.
 % Prüft, ob ein Fahrzeug A (VName) durch ein anderes Fahrzeug B (OtherName) blockiert wird, das gemäß den Vorfahrtsregeln Vorrang

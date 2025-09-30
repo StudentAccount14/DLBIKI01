@@ -14,6 +14,7 @@ opposite(south, north).
 opposite(east, west).
 opposite(west, east).
 
+
 % Linksabbieger-Regel: Bei Gegenverkehr hat ein Fahrzeug A (das geradeaus oder rechts fährt)
 % Vorfahrt gegenüber einem Fahrzeug B, das links abbiegt.
 has_priority_over(PosA, DirA, PosB, DirB) :-
@@ -25,6 +26,11 @@ has_priority_over(PosA, DirA, PosB, DirB) :-
 has_green_light(VName) :-
     vehicle(VName, PosA, _),
     light(PosA, green).
+
+% Annahmen:
+% 1) Gegenüberliegende Linksabbieger biegen voreinander in die nächste Fahrspur ab
+% und behindern sich nicht.
+% 2) Klassische Ampelphasen (Nord/Süd Grün oder West/Ost Grün)
 
 % Hauptregel: can_go(VName) ist wahr, wenn das Fahrzeug A (VName) fahren darf.
 % Ein Fahrzeug darf nur fahren, wenn es Grün hat.
