@@ -20,7 +20,7 @@ opposite(south, north).
 opposite(east, west).
 opposite(west, east).
 
-% Rechts-vor-Links: Fahrzeug A hat Vorfahrt vor B, wenn A von rechts kommt.
+% Rechts-vor-links-Regel: Fahrzeug A hat Vorfahrt vor B, wenn A von rechts kommt.
 % Anmerkung: Diese und die nächste Regel prüfen nicht, ob beide Fahrzeuge auf (oder nicht auf)
 % der Vorfahrtsstraße sind. Diese Überprüfung findet in can_go/1 statt.
 has_priority_over(PosA, _DirA, PosB, _DirB) :-

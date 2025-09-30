@@ -25,7 +25,7 @@ priority_order(west, 2).
 priority_order(south, 3).
 priority_order(east, 4).
 
-% Rechts-vor-Links: Fahrzeug A hat Vorfahrt vor B, wenn A von rechts kommt.
+% Rechts-vor-links-Regel: Fahrzeug A hat Vorfahrt vor B, wenn A von rechts kommt.
 has_priority_over(PosA, _DirA, PosB, _DirB) :-
     to_right_of(PosA, PosB).  % A kommt von rechts von B
 
